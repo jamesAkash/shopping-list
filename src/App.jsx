@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const initialItems = [
   { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
+  { id: 2, description: "Socks", quantity: 12, packed: true },
   { id: 3, description: "Charger", quantity: 1, packed: true },
 ];
 
@@ -12,8 +12,8 @@ function App() {
     <div className="app">
       <Logo />
       <Form items={items} setItems={setItems} />
-      <ShoppingList items={items} />
-      <Stats />
+      <ShoppingList items={items} setItems={setItems} />
+      <Stats items={items} />
     </div>
   );
 }
@@ -42,7 +42,7 @@ function Form({ setItems, items }) {
 
   return (
     <form className="add-form" onSubmit={handleSubmit}>
-      <h3>What to buy? 🔥</h3>
+      <h3 className="head">What to buy? 🔥</h3>
       <select value={amt} onChange={(e) => setAmt(e.target.value)}>
         {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
           <option key={num}>{num}</option>
@@ -59,35 +59,57 @@ function Form({ setItems, items }) {
     </form>
   );
 }
-function ShoppingList({ items }) {
-  console.log(items);
+function ShoppingList({ items, setItems }) {
+  // console.log(items);
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item key={item.id} {...item} />
+          <Item items={items} setItems={setItems} key={item.id} {...item} />
         ))}
       </ul>
     </div>
   );
 }
 
-function Stats() {
+function Stats({ items }) {
+  const len = items.length;
+  const packed = items.filter((item) => item.packed === true);
   return (
     <footer className="stats">
-      <em>you have X items on your list and you already packed X</em>
+      <em>
+        you have {len} items on your list and you already packed -
+        {packed.map((items, i) => {
+          return (
+            <span key={i} style={{ color: "green" }}>
+              {items.description},{" "}
+            </span>
+          );
+        })}
+      </em>
     </footer>
   );
 }
 
-const Item = ({ id, quantity, description, packed }) => {
+const Item = ({ id, quantity, description, packed, items, setItems }) => {
+  const deleteItem = (id) => {
+    const updated = items.filter((item) => item.id !== id);
+    setItems(updated);
+  };
+  const handleChange = (id) => {
+    const checkUncheck = items.find((item) => item.id === id);
+  };
   return (
     <li key={id} style={{ color: "#fff" }}>
-      <input type="checkbox" />
+      <input
+        type="checkbox"
+        checked={packed}
+        onChange={() => handleChange(id)}
+      />
       <span className={`${packed ? "strike" : ""}`}>
         {quantity} {description}
       </span>
-      <button>❌</button>
+      <button onClick={() => deleteItem(id)}>❌</button>
     </li>
   );
 };

@@ -138,3 +138,25 @@ input[type="checkbox"] {
 .strike {
   text-decoration: line-through;
 }
+
+@media (max-width: 600px) {
+  .app {
+    padding: 0;
+  }
+  .head {
+    display: none;
+  }
+
+  .add-form {
+    flex-direction: column;
+    padding-inline: 20px;
+    /* display: block; */
+  }
+
+  button,
+  select,
+  input {
+    width: 100%;
+    text-align: center;
+  }
+}
