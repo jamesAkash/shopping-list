@@ -2,27 +2,47 @@ import { useState } from "react";
 
 const initialItems = [
   { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: true },
+  { id: 2, description: "Socks", quantity: 12, packed: false },
   { id: 3, description: "Charger", quantity: 1, packed: true },
 ];
 
 function App() {
   const [items, setItems] = useState(initialItems);
+  function handleAddItems(item) {
+    setItems((items) => [...items, item]);
+  }
+  function handleDeleteItem(id) {
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
+  function handleToggleItem(id) {
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, packed: !item.packed } : item
+      )
+    );
+  }
   return (
     <div className="app">
       <Logo />
-      <Form items={items} setItems={setItems} />
-      <ShoppingList items={items} setItems={setItems} />
+      <Form items={items} onAddItems={handleAddItems} />
+      <ShoppingList
+        items={items}
+        onDeleteItem={handleDeleteItem}
+        onToggleItem={handleToggleItem}
+      />
       <Stats items={items} />
     </div>
   );
 }
 
 function Logo() {
-  return <h1>Shop it!🛒</h1>;
+  return <h1>Shopping List!🛒</h1>;
 }
 
-function Form({ setItems, items }) {
+function Form({ onAddItems, items }) {
+  const [text, setText] = useState("");
+  const [amt, setAmt] = useState(1);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (text) {
@@ -33,12 +53,9 @@ function Form({ setItems, items }) {
         quantity: amt,
         packed: false,
       };
-      setItems([...items, newItem]);
+      onAddItems(newItem);
     }
   };
-
-  const [text, setText] = useState("");
-  const [amt, setAmt] = useState(1);
 
   return (
     <form className="add-form" onSubmit={handleSubmit}>
@@ -59,13 +76,17 @@ function Form({ setItems, items }) {
     </form>
   );
 }
-function ShoppingList({ items, setItems }) {
-  // console.log(items);
+function ShoppingList({ items, onDeleteItem, onToggleItem }) {
   return (
     <div className="list">
       <ul>
         {items.map((item) => (
-          <Item items={items} setItems={setItems} key={item.id} {...item} />
+          <Item
+            onDeleteItem={onDeleteItem}
+            onToggleItem={onToggleItem}
+            key={item.id}
+            {...item}
+          />
         ))}
       </ul>
     </div>
@@ -78,38 +99,44 @@ function Stats({ items }) {
   return (
     <footer className="stats">
       <em>
-        you have {len} items on your list and you already packed -
-        {packed.map((items, i) => {
-          return (
-            <span key={i} style={{ color: "green" }}>
-              {items.description},{" "}
-            </span>
-          );
-        })}
+        You have <span style={{ color: "blue" }}>{len} items</span> on your list
+        {packed.length > 0 && (
+          <p>
+            you already packed -
+            {packed.map((items, i) => {
+              return (
+                <span key={i} style={{ color: "green", display: "block" }}>
+                  {items.description},{" "}
+                </span>
+              );
+            })}
+          </p>
+        )}
       </em>
     </footer>
   );
 }
 
-const Item = ({ id, quantity, description, packed, items, setItems }) => {
-  const deleteItem = (id) => {
-    const updated = items.filter((item) => item.id !== id);
-    setItems(updated);
-  };
-  const handleChange = (id) => {
-    const checkUncheck = items.find((item) => item.id === id);
-  };
+const Item = ({
+  id,
+  quantity,
+  description,
+  packed,
+  onDeleteItem,
+  onToggleItem,
+}) => {
   return (
     <li key={id} style={{ color: "#fff" }}>
+      {/* {console.log(packed)} */}
       <input
         type="checkbox"
         checked={packed}
-        onChange={() => handleChange(id)}
+        onChange={() => onToggleItem(id)}
       />
-      <span className={`${packed ? "strike" : ""}`}>
+      <span className={`${packed ? "strike listItem" : ""}`}>
         {quantity} {description}
       </span>
-      <button onClick={() => deleteItem(id)}>❌</button>
+      <button onClick={() => onDeleteItem(id)}>❌</button>
     </li>
   );
 };

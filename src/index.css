@@ -32,12 +32,12 @@ body {
 h1 {
   text-align: center;
   background-color: #6366f1;
-  font-family: "Monoton";
-  font-size: 8rem;
+  /* font-family: "Monoton"; */
+  font-size: clamp(3.7rem, 2vw, 6rem);
   text-transform: uppercase;
-  font-weight: 400;
-  word-spacing: 30px;
-  letter-spacing: -5px;
+  font-weight: 600;
+  /* word-spacing: 30px; */
+  /* letter-spacing: -5px; */
   padding: 2.4rem 0;
 }
 
